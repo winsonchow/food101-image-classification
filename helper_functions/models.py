@@ -106,3 +106,43 @@ class SimpleVGG(nn.Module):
         x = self.conv_block_2(x)
         x = self.classifier(x)
         return x
+
+    
+    
+    
+    
+def feature_extractor(weights, base_model, base_model_name, num_classes, device):
+    """
+    Creates a feature extractor model.
+
+    Args:
+        weights (str): Pre-trained weights to initialize the base model.
+        base_model (torch.nn.Module): Base model architecture to use.
+        base_model_name (str): Name of the model
+        num_classes (int): Number of classes for the new classifier head.
+        device (str): Target device for the model.
+        seed (int, optional): Seed for reproducibility. Default is 42.
+
+    Returns:
+        torch.nn.Module: Feature extractor model.
+    """
+    # Set seed for reproducibility
+    # set_seed(seed)
+    
+    # Load pre-trained weights and send the base model to the target device
+    model = base_model(pretrained=True, weights=weights).to(device)
+    
+    # Freeze base model layers
+    for param in base_model.parameters():
+        param.requires_grad = False
+    
+    # Change the classifier head
+    num_features = base_model.fc.in_features
+    new_classifier = torch.nn.Linear(num_features, num_classes)
+    model.fc = new_classifier
+    
+    # Set a custom name for the model
+    model.name = base_model_name
+    
+    print(f"[INFO] Created new {model.name} model.")
+    return base_model

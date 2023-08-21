@@ -1,9 +1,7 @@
 """
-Contains functions for training and testing a OyTorch model.
+Contains functions for training and testing a PyTorch model.
 """
-
 import torch
-
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
 
@@ -86,8 +84,9 @@ def test_model(model, dataloader, loss_fn, device):
 
 
 
-def train_and_test_model(model, train_dataloader, test_dataloader, optimizer, loss_fn, epochs, device):
-    model.to(device)  # Move the model to the specified device
+def train_and_test_model(model, train_dataloader, test_dataloader, optimizer, loss_fn, epochs, device, writer):
+    # Move the model to the specified device
+    model.to(device)
 
     train_loss_list = []
     train_accuracy_list = []
@@ -111,6 +110,18 @@ def train_and_test_model(model, train_dataloader, test_dataloader, optimizer, lo
         print(f"Train Loss: {train_loss:.4f} - Train Accuracy: {train_accuracy:.4f}")
         print(f"Test Loss: {test_loss:.4f} - Test Accuracy: {test_accuracy:.4f}")
         print("=" * 50)
+        
+        # Log metrics to SummaryWriter
+        if writer:
+            writer.add_scalar('Loss/Train', train_loss, epoch)
+            writer.add_scalar('Loss/Test', test_loss, epoch)
+            writer.add_scalar('Accuracy/Train', train_accuracy, epoch)
+            writer.add_scalar('Accuracy/Test', test_accuracy, epoch)
+        
+            # Close the SummaryWriter
+            writer.close()
+        else:
+            pass
     
     evaluation_metrics = {
         'train_loss': train_loss_list,
