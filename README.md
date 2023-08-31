@@ -1,4 +1,4 @@
-# Image Classification on Food-101 Dataset
+# Image Classification on Food-101 Dataset with PyTorch
 ## Table of Contents
 
 - [Introduction](#introduction)
